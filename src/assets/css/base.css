@@ -1,0 +1,16 @@
+@import "./normalize.css";
+
+.el-message--success {
+	/* top: 80px !important; */
+	background-color: #eee;
+}
+ 
+.el-message .el-icon-success {
+	font-size: 18px;
+	color: #eee;
+}
+ 
+.el-message--success .el-message__content {
+  font-size: 18px;
+  font-weight: 700;
+}
