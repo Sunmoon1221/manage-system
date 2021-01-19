@@ -7,9 +7,26 @@
     </el-breadcrumb>
 
     <el-card shadow="always">
-      <Search inputPlaceholder="请输入姓名" 
-			v-model="user.query"
-			@search="clickSearchButton"></Search>
+      <el-row :gutter="24">
+        <el-col :span="8" :offset="0">
+          <Search
+            inputPlaceholder="请输入姓名"
+            v-model="user.query"
+            @search="clickSearchButton"
+          ></Search
+        ></el-col>
+        <el-col :span="2" :offset="12">
+          <el-button
+            type="primary"
+            size="medium"
+            round
+            class="addUserBtn"
+            @click="clickAddUserBtn"
+            >添加管理员</el-button
+          >
+        </el-col>
+      </el-row>
+
       <el-table
         stripe
         :data="newUserList"
@@ -19,7 +36,7 @@
         <el-table-column type="index"> </el-table-column>
         <el-table-column prop="create_time" label="日期" sortable width="120">
         </el-table-column>
-        <el-table-column prop="username" label="姓名" sortable width="120">
+        <el-table-column prop="username" label="姓名" sortable width="100">
         </el-table-column>
         <el-table-column prop="email" label="邮箱" width="140">
         </el-table-column>
@@ -82,6 +99,41 @@
         :total="totalNum"
       >
       </el-pagination>
+
+      <el-dialog
+        title="添加管理员"
+        :visible.sync="addUserDialogVisible"
+        width="44%"
+				center
+				@close="closeAddUserForm"
+      >
+        <el-form
+          :model="addUserForm"
+          :rules="addUserFormRules"
+          ref="addUserFormRef"
+          label-width="80px"
+          class="demo-ruleForm"
+        >
+          <el-form-item label="姓名" prop="username">
+            <el-input v-model="addUserForm.username"></el-input>
+          </el-form-item>
+          <el-form-item label="密码" prop="password">
+            <el-input v-model="addUserForm.password"></el-input>
+          </el-form-item>
+          <el-form-item label="邮箱" prop="email">
+            <el-input v-model="addUserForm.email"></el-input>
+          </el-form-item>
+          <el-form-item label="手机号" prop="mobile">
+            <el-input v-model="addUserForm.mobile"></el-input>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button round class="cancelBtn" @click="addUserDialogVisible = false">取 消</el-button>
+          <el-button round class="sureBtn" type="primary" @click="clickAddUser"
+            >添 加</el-button
+          >
+        </span>
+      </el-dialog>
     </el-card>
   </div>
 </template>
@@ -89,13 +141,30 @@
 <script>
 import Search from "@/components/common/search/Search";
 
-import { getUsers,putEditUser } from "../../network/user";
+import { getUsers, postAddUsers,postUsers } from "../../network/user";
 import moment from "moment";
 export default {
   components: {
     Search,
   },
   data() {
+    // 验证邮箱的规则
+    var checkEmail = (rule, value, cb) => {
+      const regEmail = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+
+      if (regEmail.test(value)) {
+        return cb();
+      }
+      cb(new Error("请输入合法的邮箱"));
+    };
+    // 验证手机号的规则
+    var checkMobile = (rule, value, cb) => {
+      const regMobile = /^(?:(?:\+|00)86)?1(?:(?:3[\d])|(?:4[5-7|9])|(?:5[0-3|5-9])|(?:6[5-7])|(?:7[0-8])|(?:8[\d])|(?:9[1|8|9]))\d{8}$/;
+      if (regMobile.test(value)) {
+        return cb();
+      }
+      cb(new Error("请输入合法的手机号"));
+    };
     return {
       user: {
         query: "",
@@ -104,7 +173,27 @@ export default {
       },
       userList: [],
       totalNum: 0,
-      currentPage: 1,
+
+      addUserDialogVisible: false,
+
+      addUserForm: {
+        username: "",
+        password: "",
+        email: "",
+        mobile: "",
+      },
+      addUserFormRules: {
+        username: [{ required: true, message: "请输入姓名", trigger: "blur" }],
+        password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+        email: [
+          { required: true, message: "请输入邮箱", trigger: "blur" },
+          { validator: checkEmail, trigger: "blur" },
+        ],
+        mobile: [
+          { required: true, message: "请输入手机号", trigger: "blur" },
+          { validator: checkMobile, trigger: "blur" },
+        ],
+      },
     };
   },
   created() {
@@ -123,40 +212,57 @@ export default {
     },
   },
   methods: {
+		// 请求用户列表
     async getUserList() {
       const { data: res } = await getUsers(this.user);
       if (res.meta.status !== 200)
         return this.$message.error("获取管理员列表失败");
       this.userList = res.data.users;
       this.totalNum = res.data.total;
-
-      console.log(this.userList);
+    },
+    async editUser(userInfo) {
+      let url = `users/${userInfo.id}/state/${userInfo.mg_state}`;
+      // let url = `users/${userInfo.id}/stte/${userInfo.mg_state}`
+      const { data: res } = await putEditUser(url);
+      if (res.meta.status !== 200) {
+        userInfo.mg_state = !userInfo.mg_state;
+        return this.$message.error("更新用户状态失败");
+      }
+      console.log(res);
 		},
-		async editUser(userInfo) {
-			let url = `users/${userInfo.id}/state/${userInfo.mg_state}`
-			// let url = `users/${userInfo.id}/stte/${userInfo.mg_state}`
-			const { data: res } = await putEditUser(url);
-			if(res.meta.status!== 200) {
-				userInfo.mg_state = !userInfo.mg_state
-				return this.$message.error("更新用户状态失败");
-			}
-			
-			console.log(res)
+		async addUser() {
+			const {data: res} = await postAddUsers(this.addUserForm)
+			if(res.meta.status !== 201) return this.$message.error('创建用户失败')
 		},
     handleSizeChange(val) {
-			this.user.pagesize = val
-			this.getUserList();
+      this.user.pagesize = val;
+      this.getUserList();
     },
     handleCurrentChange(val) {
-			this.user.pagenum = val
-			this.getUserList();
+      this.user.pagenum = val;
+      this.getUserList();
+    },
+    userStatusChange(userInfo) {
+      // this.editUser(userInfo.id,userInfo.mg_state)
+      this.editUser(userInfo);
+    },
+    clickSearchButton() {
+      this.getUserList();
+    },
+    clickAddUserBtn() {
+      this.addUserDialogVisible = true;
 		},
-		userStatusChange(userInfo) {
-			// this.editUser(userInfo.id,userInfo.mg_state)
-			this.editUser(userInfo)
+		closeAddUserForm() {
+			this.$refs.addUserFormRef.resetFields()
 		},
-		clickSearchButton() {
-			this.getUserList()
+		clickAddUser() {
+			this.$refs.addUserFormRef.validate(valid => {
+				if(!valid) return 
+				this.addUser()
+				this.addUserDialogVisible = false
+				this.getUserList()
+				
+			})
 		}
   },
 };
@@ -164,9 +270,22 @@ export default {
 
 <style lang="less" scoped>
 .el-card {
-  height: 500px;
+  // height: 500px;
+  padding-top: 8px;
 }
 .el-table {
-	margin: 18px 0;
+  margin: 18px 0;
+  overflow-x: hidden;
+}
+.addUserBtn {
+}
+/deep/.el-input__inner {
+  width: 80%;
+}
+.cancelBtn {
+	margin-right: 40px;
+}
+/deep/.el-dialog {
+	border-radius: 20px;
 }
 </style>

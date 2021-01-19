@@ -43,6 +43,7 @@ export default {
 
 <style lang="less" scoped>
 .search {
+	display: inline-block;
   height: 30px;
 }
 input {
