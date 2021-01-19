@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 const Login = () => import('../views/login/Login')
 const Home = () => import('../views/home/Home')
 const Welcome = () => import('../views/welcome/Welcome')
+const UserList = () => import('../views/userList/UserList')
 Vue.use(VueRouter)
 
 const routes = [
@@ -28,6 +29,11 @@ const routes = [
 				path: '/welcome',
 				name:Welcome,
 				component: Welcome
+			},
+			{
+				path: '/users',
+				name:UserList,
+				component: UserList
 			}
 		]
 	}
