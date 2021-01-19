@@ -11,7 +11,15 @@ import {
 	Main,
 	Menu,
 	Submenu,
-	MenuItem
+	MenuItem,
+	Breadcrumb,
+	BreadcrumbItem,
+	Card,
+	Table,
+	TableColumn,
+	Switch,
+	Tooltip,
+	Pagination
 
 } from 'element-ui';
 
@@ -26,5 +34,13 @@ Vue.component(Main.name, Main);
 Vue.component(Menu.name, Menu);
 Vue.component(MenuItem.name, MenuItem);
 Vue.component(Submenu.name, Submenu);
+Vue.component(Breadcrumb.name, Breadcrumb);
+Vue.component(BreadcrumbItem.name, BreadcrumbItem);
+Vue.component(Card.name, Card);
+Vue.component(Table.name, Table);
+Vue.component(TableColumn.name, TableColumn);
+Vue.component(Switch.name, Switch);
+Vue.component(Tooltip.name, Tooltip);
+Vue.component(Pagination.name, Pagination);
 
 Vue.prototype.$message = Message

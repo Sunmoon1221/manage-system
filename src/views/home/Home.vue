@@ -11,12 +11,13 @@
         <img class="logo" v-show="!isCollapse" src="../../assets/image/logo/logo.png" alt="" />
         <img class="logo" v-show="isCollapse" src="../../assets/image/logo/logo2.png" alt="" />
         <el-menu
-          default-active="1-4-1"
+          :default-active="$route.path"
           class="el-menu-vertical-demo"
           unique-opened
           :collapse="isCollapse"
 					:collapse-transition="false"
 					router
+					
         >
           <el-submenu
             :index="'/' + item.path"
@@ -98,7 +99,7 @@ body {
 	position: relative;
   background-color: #fff;
   text-align: center;
-  overflow-y: hidden;
+	overflow-y: hidden;
 
   .logo {
     width: 90%;
