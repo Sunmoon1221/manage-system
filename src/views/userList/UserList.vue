@@ -74,7 +74,7 @@
               placement="top"
               :enterable="false"
             >
-              <el-button type="info" icon="el-icon-delete" circle></el-button>
+              <el-button type="info" icon="el-icon-delete" circle @click="clickDeleteUserBtn(scope.row.id)"></el-button>
             </el-tooltip>
             <el-tooltip
               class="item"
@@ -187,7 +187,8 @@ import {
   postAddUsers,
   putEditUserState,
   getUserById,
-  putEditUser,
+	putEditUser,
+	deleteUserById
 } from "../../network/user";
 import moment from "moment";
 export default {
@@ -310,7 +311,14 @@ export default {
       if (res.meta.status !== 200) return this.$message.error("修改信息失败");
       this.editUserDialogVisible = false;
       this.getUserList();
-    },
+		},
+		async deleteUser(id) {
+			let url = `users/${id}`
+			const {data: res} = await deleteUserById(url)
+			if(res.meta.status !== 200) return this.$message.error('删除失败')
+			this.getUserList()
+			console.log(res)
+		},
     handleSizeChange(val) {
       this.user.pagesize = val;
       this.getUserList();
@@ -350,8 +358,27 @@ export default {
         if (!valid) return;
         this.editUser();
       });
-		},
-		
+    },
+    clickDeleteUserBtn(id) {
+      this.$confirm("是否删除该管理员?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+					this.deleteUser(id)
+          this.$message({
+            type: "success",
+            message: "删除成功!",
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
+    },
   },
 };
 </script>

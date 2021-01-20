@@ -28,10 +28,15 @@ export function getUserById(url) {
 	})
 }
 
-export function putEditUser(url,data) {
+export function putEditUser(url) {
 	return request({
 		url,
-		method: 'put',
-		data
+		method: 'delete'
+	})
+}
+export function deleteUserById(url,data) {
+	return request({
+		url,
+		method: 'delete'
 	})
 }
