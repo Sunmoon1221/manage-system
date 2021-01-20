@@ -16,7 +16,7 @@ export function postAddUsers(data) {
 	})
 }
 // 更改用户状态
-export function putEditUser(url) {
+export function putEditUserState(url) {
 	return request({
 		url,
 		method: 'put',
@@ -28,3 +28,10 @@ export function getUserById(url) {
 	})
 }
 
+export function putEditUser(url,data) {
+	return request({
+		url,
+		method: 'put',
+		data
+	})
+}

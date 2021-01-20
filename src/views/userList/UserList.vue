@@ -152,9 +152,10 @@
         <el-form
           :model="editForm"
           :rules="editFormRules"
-          ref="editFormRulesRef"
+          ref="editFormRef"
           label-width="80px"
           class="demo-ruleForm"
+          @close="closeEditForm"
         >
           <el-form-item label="姓名" prop="username">
             <el-input disabled v-model="editForm.username"></el-input>
@@ -166,8 +167,10 @@
             <el-input v-model="editForm.mobile"></el-input> </el-form-item
         ></el-form>
         <span slot="footer" class="dialog-footer">
-          <el-button round @click="editUserDialogVisible = false">取 消</el-button>
-          <el-button round type="primary" @click="editUserDialogVisible = false"
+          <el-button round @click="editUserDialogVisible = false"
+            >取 消</el-button
+          >
+          <el-button round type="primary" @click="clickEditUser"
             >确 定</el-button
           >
         </span>
@@ -182,8 +185,9 @@ import Search from "@/components/common/search/Search";
 import {
   getUsers,
   postAddUsers,
-  putEditUser,
+  putEditUserState,
   getUserById,
+  putEditUser,
 } from "../../network/user";
 import moment from "moment";
 export default {
@@ -244,12 +248,8 @@ export default {
         mobile: "",
       },
       editFormRules: {
-        email: [
-          { validator: checkEmail, trigger: "blur" },
-        ],
-        mobile: [
-          { validator: checkMobile, trigger: "blur" },
-        ],
+        email: [{ validator: checkEmail, trigger: "blur" }],
+        mobile: [{ validator: checkMobile, trigger: "blur" }],
       },
     };
   },
@@ -278,10 +278,10 @@ export default {
       this.userList = res.data.users;
       this.totalNum = res.data.total;
     },
-    async editUser(userInfo) {
+    async editUserState(userInfo) {
       let url = `users/${userInfo.id}/state/${userInfo.mg_state}`;
       // let url = `users/${userInfo.id}/stte/${userInfo.mg_state}`
-      const { data: res } = await putEditUser(url);
+      const { data: res } = await putEditUserState(url);
       if (res.meta.status !== 200) {
         userInfo.mg_state = !userInfo.mg_state;
         return this.$message.error("更新用户状态失败");
@@ -291,6 +291,8 @@ export default {
     async addUser() {
       const { data: res } = await postAddUsers(this.addUserForm);
       if (res.meta.status !== 201) return this.$message.error("创建用户失败");
+      this.addUserDialogVisible = false;
+      this.getUserList();
     },
     async getEditUser(id) {
       const { data: res } = await getUserById(`users/${id}`);
@@ -299,6 +301,15 @@ export default {
       this.editForm = res.data;
       // TODO待删除
       console.log(this.editForm);
+    },
+    async editUser() {
+      let url = `users/${this.editForm.id}`;
+      let { email, mobile } = this.editForm;
+      let dataForm = { email, mobile };
+      const { data: res } = await putEditUser(url, dataForm);
+      if (res.meta.status !== 200) return this.$message.error("修改信息失败");
+      this.editUserDialogVisible = false;
+      this.getUserList();
     },
     handleSizeChange(val) {
       this.user.pagesize = val;
@@ -310,7 +321,7 @@ export default {
     },
     userStatusChange(userInfo) {
       // this.editUser(userInfo.id,userInfo.mg_state)
-      this.editUser(userInfo);
+      this.editUserState(userInfo);
     },
     clickSearchButton() {
       this.getUserList();
@@ -325,14 +336,22 @@ export default {
       this.$refs.addUserFormRef.validate((valid) => {
         if (!valid) return;
         this.addUser();
-        this.addUserDialogVisible = false;
-        this.getUserList();
       });
     },
     clickEditUserBtn(id) {
       this.getEditUser(id);
       this.editUserDialogVisible = true;
     },
+    closeEditForm() {
+      this.$refs.editForm.resetFields();
+    },
+    clickEditUser() {
+      this.$refs.editFormRef.validate((valid) => {
+        if (!valid) return;
+        this.editUser();
+      });
+		},
+		
   },
 };
 </script>
