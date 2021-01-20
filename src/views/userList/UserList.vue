@@ -61,7 +61,11 @@
               placement="top"
               :enterable="false"
             >
-              <el-button icon="el-icon-edit" circle></el-button>
+              <el-button
+                icon="el-icon-edit"
+                @click="clickEditUserBtn(scope.row.id)"
+                circle
+              ></el-button>
             </el-tooltip>
             <el-tooltip
               class="item"
@@ -99,13 +103,13 @@
         :total="totalNum"
       >
       </el-pagination>
-
+      <!-- 添加管理员对话框 -->
       <el-dialog
         title="添加管理员"
         :visible.sync="addUserDialogVisible"
         width="44%"
-				center
-				@close="closeAddUserForm"
+        center
+        @close="closeAddUserForm"
       >
         <el-form
           :model="addUserForm"
@@ -128,9 +132,43 @@
           </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
-          <el-button round class="cancelBtn" @click="addUserDialogVisible = false">取 消</el-button>
+          <el-button
+            round
+            class="cancelBtn"
+            @click="addUserDialogVisible = false"
+            >取 消</el-button
+          >
           <el-button round class="sureBtn" type="primary" @click="clickAddUser"
             >添 加</el-button
+          >
+        </span>
+      </el-dialog>
+      <!-- 修改管理员信息对话框 -->
+      <el-dialog
+        title="修改信息"
+        :visible.sync="editUserDialogVisible"
+        width="50%"
+      >
+        <el-form
+          :model="editForm"
+          :rules="editFormRules"
+          ref="editFormRulesRef"
+          label-width="80px"
+          class="demo-ruleForm"
+        >
+          <el-form-item label="姓名" prop="username">
+            <el-input disabled v-model="editForm.username"></el-input>
+          </el-form-item>
+          <el-form-item label="邮箱" prop="email">
+            <el-input v-model="editForm.email"></el-input>
+          </el-form-item>
+          <el-form-item label="手机号" prop="mobile">
+            <el-input v-model="editForm.mobile"></el-input> </el-form-item
+        ></el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button round @click="editUserDialogVisible = false">取 消</el-button>
+          <el-button round type="primary" @click="editUserDialogVisible = false"
+            >确 定</el-button
           >
         </span>
       </el-dialog>
@@ -141,7 +179,12 @@
 <script>
 import Search from "@/components/common/search/Search";
 
-import { getUsers, postAddUsers,postUsers } from "../../network/user";
+import {
+  getUsers,
+  postAddUsers,
+  putEditUser,
+  getUserById,
+} from "../../network/user";
 import moment from "moment";
 export default {
   components: {
@@ -194,12 +237,27 @@ export default {
           { validator: checkMobile, trigger: "blur" },
         ],
       },
+
+      editUserDialogVisible: false,
+      editForm: {
+        email: "",
+        mobile: "",
+      },
+      editFormRules: {
+        email: [
+          { validator: checkEmail, trigger: "blur" },
+        ],
+        mobile: [
+          { validator: checkMobile, trigger: "blur" },
+        ],
+      },
     };
   },
   created() {
     this.getUserList();
   },
   computed: {
+    // 格式化时间戳
     newUserList() {
       let newarr = this.userList.map((item) => {
         let date = new Date(item.create_time * 1000);
@@ -212,7 +270,7 @@ export default {
     },
   },
   methods: {
-		// 请求用户列表
+    // 请求用户列表
     async getUserList() {
       const { data: res } = await getUsers(this.user);
       if (res.meta.status !== 200)
@@ -229,11 +287,19 @@ export default {
         return this.$message.error("更新用户状态失败");
       }
       console.log(res);
-		},
-		async addUser() {
-			const {data: res} = await postAddUsers(this.addUserForm)
-			if(res.meta.status !== 201) return this.$message.error('创建用户失败')
-		},
+    },
+    async addUser() {
+      const { data: res } = await postAddUsers(this.addUserForm);
+      if (res.meta.status !== 201) return this.$message.error("创建用户失败");
+    },
+    async getEditUser(id) {
+      const { data: res } = await getUserById(`users/${id}`);
+      if (res.meta.status !== 200)
+        return this.$message.error("获取用户信息失败");
+      this.editForm = res.data;
+      // TODO待删除
+      console.log(this.editForm);
+    },
     handleSizeChange(val) {
       this.user.pagesize = val;
       this.getUserList();
@@ -251,19 +317,22 @@ export default {
     },
     clickAddUserBtn() {
       this.addUserDialogVisible = true;
-		},
-		closeAddUserForm() {
-			this.$refs.addUserFormRef.resetFields()
-		},
-		clickAddUser() {
-			this.$refs.addUserFormRef.validate(valid => {
-				if(!valid) return 
-				this.addUser()
-				this.addUserDialogVisible = false
-				this.getUserList()
-				
-			})
-		}
+    },
+    closeAddUserForm() {
+      this.$refs.addUserFormRef.resetFields();
+    },
+    clickAddUser() {
+      this.$refs.addUserFormRef.validate((valid) => {
+        if (!valid) return;
+        this.addUser();
+        this.addUserDialogVisible = false;
+        this.getUserList();
+      });
+    },
+    clickEditUserBtn(id) {
+      this.getEditUser(id);
+      this.editUserDialogVisible = true;
+    },
   },
 };
 </script>
@@ -283,9 +352,9 @@ export default {
   width: 80%;
 }
 .cancelBtn {
-	margin-right: 40px;
+  margin-right: 40px;
 }
 /deep/.el-dialog {
-	border-radius: 20px;
+  border-radius: 20px;
 }
 </style>
