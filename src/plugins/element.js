@@ -22,7 +22,8 @@ import {
 	Pagination,
 	Row,
 	Col,
-	Dialog
+	Dialog,
+	MessageBox
 
 } from 'element-ui';
 
@@ -50,3 +51,4 @@ Vue.component(Col.name, Col);
 Vue.component(Dialog.name, Dialog);
 
 Vue.prototype.$message = Message
+Vue.prototype.$confirm = MessageBox.confirm
