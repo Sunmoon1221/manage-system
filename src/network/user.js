@@ -22,3 +22,9 @@ export function putEditUser(url) {
 		method: 'put',
 	})
 }
+export function getUserById(url) {
+	return request({
+		url,
+	})
+}
+
