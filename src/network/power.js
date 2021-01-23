@@ -5,3 +5,9 @@ export function getMenus() {
 		url: '/menus'
 	})
 }
+export function getAllRightList(url) {
+	return request({
+		url
+	})
+}
+
