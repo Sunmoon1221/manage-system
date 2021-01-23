@@ -4,6 +4,7 @@ const Login = () => import('../views/login/Login')
 const Home = () => import('../views/home/Home')
 const Welcome = () => import('../views/welcome/Welcome')
 const UserList = () => import('../views/userList/UserList')
+const RightList = () => import('../views/rightList/RightList')
 Vue.use(VueRouter)
 
 const routes = [
@@ -34,6 +35,11 @@ const routes = [
 				path: '/users',
 				name:UserList,
 				component: UserList
+			},
+			{
+				path:'/rights',
+				name: RightList,
+				component: RightList
 			}
 		]
 	}
