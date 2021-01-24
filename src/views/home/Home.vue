@@ -78,7 +78,6 @@ export default {
       const { data: res } = await getMenus();
       // console.log(res)
       this.asideMenu = res.data;
-      console.log(this.asideMenu);
     },
 
     collapseAside() {

@@ -24,12 +24,17 @@ import {
 	Col,
 	Dialog,
 	MessageBox,
-	Tag
+	Tag,
+	Tree,
+	Option
+
 
 } from 'element-ui';
+import CollapseTransition from 'element-ui/lib/transitions/collapse-transition';
 
 Vue.component(Button.name, Button);
 Vue.component(Select.name, Select);
+Vue.component(Option.name, Option);
 Vue.component(Form.name, Form);
 Vue.component(FormItem.name, FormItem);
 Vue.component(Input.name, Input);
@@ -51,6 +56,9 @@ Vue.component(Row.name, Row);
 Vue.component(Col.name, Col);
 Vue.component(Dialog.name, Dialog);
 Vue.component(Tag.name, Tag);
+Vue.component(Tree.name, Tree);
+
+Vue.component(CollapseTransition.name, CollapseTransition)
 
 Vue.prototype.$message = Message
 Vue.prototype.$confirm = MessageBox.confirm

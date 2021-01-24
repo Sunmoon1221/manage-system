@@ -74,7 +74,12 @@
               placement="top"
               :enterable="false"
             >
-              <el-button type="info" icon="el-icon-delete" circle @click="clickDeleteUserBtn(scope.row.id)"></el-button>
+              <el-button
+                type="info"
+                icon="el-icon-delete"
+                circle
+                @click="clickDeleteUserBtn(scope.row.id)"
+              ></el-button>
             </el-tooltip>
             <el-tooltip
               class="item"
@@ -87,6 +92,7 @@
                 type="primary"
                 icon="el-icon-edit-outline"
                 circle
+                @click="clickAllotBtn(scope.row)"
               ></el-button>
             </el-tooltip>
           </template>
@@ -116,7 +122,7 @@
           :rules="addUserFormRules"
           ref="addUserFormRef"
           label-width="80px"
-          class="demo-ruleForm"
+          class="addUserForm"
         >
           <el-form-item label="姓名" prop="username">
             <el-input v-model="addUserForm.username"></el-input>
@@ -154,7 +160,7 @@
           :rules="editFormRules"
           ref="editFormRef"
           label-width="80px"
-          class="demo-ruleForm"
+          class="addUserForm"
           @close="closeEditForm"
         >
           <el-form-item label="姓名" prop="username">
@@ -175,6 +181,37 @@
           >
         </span>
       </el-dialog>
+
+      <!-- 分配角色对话框 -->
+      <el-dialog
+        title="分配权限"
+        :visible.sync="allotRoleDialogVisible"
+        width="50%"
+        @close="closeAllotDialog"
+      >
+        <p class="user-info">当前用户: {{ roleInfo.username }}</p>
+        <p class="user-info">当前角色: {{ roleInfo.role_name }}</p>
+        <el-select v-model="selectRole" placeholder="请选择" width="300px">
+          <el-option
+            v-for="item in roleList"
+            :key="item.id"
+            :label="item.roleName"
+            :value="item.id"
+          >
+          </el-option>
+        </el-select>
+        <span slot="footer" class="dialog-footer">
+          <el-button round @click="allotRoleDialogVisible = false"
+            >取 消</el-button
+          >
+          <el-button
+            round
+            type="primary"
+            @click="clickAllotRole"
+            >确 定</el-button
+          >
+        </span>
+      </el-dialog>
     </el-card>
   </div>
 </template>
@@ -187,9 +224,10 @@ import {
   postAddUsers,
   putEditUserState,
   getUserById,
-	putEditUser,
-	deleteUserById
-} from "../../network/user";
+  putEditUser,
+  deleteUserById,
+} from "@/network/user";
+import { getRoles,putAllotRole } from "@/network/role";
 import moment from "moment";
 export default {
   components: {
@@ -252,6 +290,11 @@ export default {
         email: [{ validator: checkEmail, trigger: "blur" }],
         mobile: [{ validator: checkMobile, trigger: "blur" }],
       },
+
+      allotRoleDialogVisible: false,
+      roleInfo: {},
+      roleList: [],
+      selectRole: "",
     };
   },
   created() {
@@ -311,13 +354,26 @@ export default {
       if (res.meta.status !== 200) return this.$message.error("修改信息失败");
       this.editUserDialogVisible = false;
       this.getUserList();
+    },
+    async deleteUser(id) {
+      let url = `users/${id}`;
+      const { data: res } = await deleteUserById(url);
+      if (res.meta.status !== 200) return this.$message.error("删除失败");
+      this.getUserList();
+      console.log(res);
+    },
+    async getRoleList() {
+      const { data: res } = await getRoles();
+			console.log(res);
+			if(res.meta.status !== 200) return this.$message.error('获取角色列表失败')
+			this.roleList = res.data
 		},
-		async deleteUser(id) {
-			let url = `users/${id}`
-			const {data: res} = await deleteUserById(url)
-			if(res.meta.status !== 200) return this.$message.error('删除失败')
+		async allotRole() {
+			let url = `users/${this.roleInfo.id}/role`
+			const {data: res} = await putAllotRole(url,{rid: this.selectRole})
+			if(res.meta.status !== 200) return this.$message.error('分配用户角色失败')
 			this.getUserList()
-			console.log(res)
+			
 		},
     handleSizeChange(val) {
       this.user.pagesize = val;
@@ -366,7 +422,7 @@ export default {
         type: "warning",
       })
         .then(() => {
-					this.deleteUser(id)
+          this.deleteUser(id);
           this.$message({
             type: "success",
             message: "删除成功!",
@@ -379,6 +435,23 @@ export default {
           });
         });
     },
+    closeAllotDialog() {
+			this.selectRole = ''
+		},
+    clickAllotBtn(user) {
+      this.getRoleList();
+      this.allotRoleDialogVisible = true;
+
+      // let { role_name, username } = user;
+      // this.roleInfo = { role_name, username };
+      this.roleInfo = user
+      console.log(this.roleInfo);
+		},
+		clickAllotRole() {
+			if(!this.selectRole) return this.$message.error('请选择要分配的角色')
+			this.allotRole()
+			this.allotRoleDialogVisible = false
+		}
   },
 };
 </script>
@@ -392,9 +465,7 @@ export default {
   margin: 18px 0;
   overflow-x: hidden;
 }
-.addUserBtn {
-}
-/deep/.el-input__inner {
+/deep/.addUserForm .el-input__inner {
   width: 80%;
 }
 .cancelBtn {
@@ -402,5 +473,8 @@ export default {
 }
 /deep/.el-dialog {
   border-radius: 20px;
+}
+.user-info {
+	margin-bottom: 26px;
 }
 </style>
