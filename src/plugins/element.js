@@ -26,7 +26,8 @@ import {
 	MessageBox,
 	Tag,
 	Tree,
-	Option
+	Option,
+	Cascader
 
 
 } from 'element-ui';
@@ -57,6 +58,7 @@ Vue.component(Col.name, Col);
 Vue.component(Dialog.name, Dialog);
 Vue.component(Tag.name, Tag);
 Vue.component(Tree.name, Tree);
+Vue.component(Cascader.name, Cascader);
 
 Vue.component(CollapseTransition.name, CollapseTransition)
 

@@ -6,6 +6,7 @@ const Welcome = () => import('../views/welcome/Welcome')
 const UserList = () => import('../views/userList/UserList')
 const RightList = () => import('../views/rightList/RightList')
 const RoleList = () => import('../views/roleList/RoleList')
+const GoodsCate = () => import('../views/goodsCate/GoodsCate')
 Vue.use(VueRouter)
 
 const routes = [
@@ -46,6 +47,11 @@ const routes = [
 				path: '/roles',
 				name: 'RoleList',
 				component: RoleList
+			},
+			{
+				path:'/categories',
+				name: 'GoodsCate',
+				component: GoodsCate
 			}
 		]
 	}
