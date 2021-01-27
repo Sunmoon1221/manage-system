@@ -27,7 +27,10 @@ import {
 	Tag,
 	Tree,
 	Option,
-	Cascader
+	Cascader,
+	Alert,
+	Tabs,
+	TabPane
 
 
 } from 'element-ui';
@@ -59,6 +62,9 @@ Vue.component(Dialog.name, Dialog);
 Vue.component(Tag.name, Tag);
 Vue.component(Tree.name, Tree);
 Vue.component(Cascader.name, Cascader);
+Vue.component(Alert.name, Alert);
+Vue.component(Tabs.name, Tabs);
+Vue.component(TabPane.name, TabPane);
 
 Vue.component(CollapseTransition.name, CollapseTransition)
 
