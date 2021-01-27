@@ -164,7 +164,6 @@
 </template>
 
 <script>
-// TODO
 import {
   getCategories,
   postAddCategories,

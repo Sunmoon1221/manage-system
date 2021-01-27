@@ -7,6 +7,7 @@ const UserList = () => import('../views/userList/UserList')
 const RightList = () => import('../views/rightList/RightList')
 const RoleList = () => import('../views/roleList/RoleList')
 const GoodsCate = () => import('../views/goodsCate/GoodsCate')
+const Params = () => import('../views/params/Params')
 Vue.use(VueRouter)
 
 const routes = [
@@ -52,6 +53,11 @@ const routes = [
 				path:'/categories',
 				name: 'GoodsCate',
 				component: GoodsCate
+			},
+			{
+				path: '/params',
+				name: 'Params',
+				component: Params
 			}
 		]
 	}
