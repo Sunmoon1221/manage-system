@@ -8,6 +8,8 @@ const RightList = () => import('../views/rightList/RightList')
 const RoleList = () => import('../views/roleList/RoleList')
 const GoodsCate = () => import('../views/goodsCate/GoodsCate')
 const Params = () => import('../views/params/Params')
+const GoodsList = () => import('../views/goodsList/GoodsList')
+const GoodsAdd = () => import('../views/goodsList/GoodsAdd')
 Vue.use(VueRouter)
 
 const routes = [
@@ -58,7 +60,18 @@ const routes = [
 				path: '/params',
 				name: 'Params',
 				component: Params
-			}
+			},
+			{
+				path: '/goods',
+				name: 'GoodsList',
+				component: GoodsList
+			},
+			{
+				path: '/goods/add',
+				name: 'GoodsAdd',
+				component: GoodsAdd
+			},
+
 		]
 	}
 ]
