@@ -35,7 +35,9 @@ import {
 	Step,
 	CheckboxGroup,
 	Checkbox,
-	Upload
+	Upload,
+	Timeline,
+	TimelineItem
 
 
 } from 'element-ui';
@@ -76,6 +78,8 @@ Vue.component(Step.name, Step);
 Vue.component(CheckboxGroup.name, CheckboxGroup);
 Vue.component(Checkbox.name, Checkbox);
 Vue.component(Upload.name, Upload);
+Vue.component(Timeline.name, Timeline);
+Vue.component(TimelineItem.name, TimelineItem);
 
 Vue.component(CollapseTransition.name, CollapseTransition)
 
